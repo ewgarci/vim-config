@@ -91,7 +91,7 @@ autocmd BufReadPost *
     \ endif |
 
 
-" After 4s of inactivity, check for external file modifications on next keyrpress
+" After 4s of inactivity, check for external file modifications on next keypress
 au CursorHold * checktime
 
 """""""""""""""""""""""""
@@ -179,7 +179,7 @@ let NERDTreeShowFiles=1
 nnoremap <silent> <Leader>gd :Gdiff<CR>
 nnoremap <silent> <Leader>gb :Gblame<CR>
 
-nnoremap <Leader>a :Ack 
+nnoremap <Leader>a :Ack
 
 " Put a space around comment markers
 let g:NERDSpaceDelims = 1
