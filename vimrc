@@ -34,6 +34,7 @@ set history=1000                " Remember 1000 commands
 set scrolloff=3                 " Start scrolling 3 lines before the horizontal window border
 set visualbell t_vb=            " Disable error bells
 set shortmess+=A                " Always edit file, even when swap file is found
+set foldlevelstart=99
 
 " up/down on displayed lines, not real lines. More useful than painful.
 noremap k gk
@@ -138,11 +139,19 @@ noremap K k
 "nnoremap <Left>  3<C-w><
 "nnoremap <Right> 3<C-w>>
 
-"nnoremap _ :split<cr>
-"nnoremap \| :vsplit<cr>
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+map <C-h> <C-w>h
+
+nnoremap _ :split<cr>
+nnoremap \| :vsplit<cr>
 
 vmap s :!sort<CR>
 vmap u :!sort -u<CR>
+
+" shift+k -> like shift+j, but no extra space
+noremap <S-k> gJ
 
 " Write file when you forget to use sudo
 cmap w!! w !sudo tee % >/dev/null
@@ -188,20 +197,21 @@ nnoremap <C-y> :YRShow<cr>
 let g:yankring_history_dir = '$HOME/.vim'
 let g:yankring_manual_clipboard_check = 0
 
-map <Leader>l :MiniBufExplorer<cr>
-let g:miniBufExplorerMoreThanOne = 10000
-let g:miniBufExplModSelTarget = 1
-let g:miniBufExplMapWindowNavVim = 1
-let g:miniBufExplSplitBelow=1
-let g:miniBufExplMapCTabSwitchBufs = 1
-let g:miniBufExplVSplit = 20
-
 let g:syntastic_enable_signs=1
+let g:syntastic_auto_loc_list=1
 let g:syntastic_mode_map = { 'mode': 'active',
                            \ 'active_filetypes': [],
-                           \ 'passive_filetypes': ['c', 'scss', 'html', 'scala'] }
+                           \ 'passive_filetypes': ['tex', 'c', 'scss', 'html', 'scala'] }
+let g:syntastic_javascript_checkers = ['jsxhint']
+let g:syntastic_quiet_messages = {"regex": 'assigned but unused variable'}
 
-let g:quickfixsigns_classes=['qfl', 'vcsdiff', 'breakpoints']
+let g:quickfixsigns_classes = ['qfl', 'vcsdiff', 'breakpoints']
+let g:quickfixsign_use_dummy = 0
+" Added BufEnter event to refresh when we come back to a file
+let g:quickfixsigns_class_vcsdiff = { 'sign': '*quickfixsigns#vcsdiff#Signs',
+                                    \ 'get': 'quickfixsigns#vcsdiff#GetList(%s)',
+                                    \ 'event': ['BufEnter', 'BufRead', 'BufWritePost'],
+                                    \ 'level': 6}
 
 let g:Powerline_symbols = 'unicode'
 set laststatus=2
@@ -266,3 +276,27 @@ end
 so ~/.vim/vimrc.mine
 
 " TODO raise contrast for comments
+
+autocmd FileType markdown setlocal syntax=off
+
+let g:vim_json_syntax_conceal = 0
+
+
+"" Rainbow config
+let g:rainbow_conf = { 'ctermfgs': ['red', 'yellow', 'green', 'cyan', 'magenta', 'red', 'yellow', 'green', 'cyan', 'magenta'] }
+let g:rainbow_matching_filetypes = ['lisp', 'scheme', 'clojure', 'javascript', 'html']
+
+function s:load()
+  if count(g:rainbow_matching_filetypes, &ft) > 0
+    call rainbow#hook()
+  endif
+endfunction
+
+augroup rainbow
+  autocmd!
+  autocmd BufNewFile,BufReadPost,FilterReadPost,FileReadPost,Syntax * nested call s:load()
+augroup END
+
+" fix for vim-javascript + rainbow incompatibility
+autocmd FileType javascript syntax clear jsFuncBlock
+set nocursorline
